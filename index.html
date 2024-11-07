@@ -255,17 +255,29 @@
                 const strengths = Object.keys(answerCounts).sort((a, b) => answerCounts[b] - answerCounts[a]);
                 const topTwoStrengths = strengths.slice(0, 2);
 
+                const strengthsDescriptions = {
+                    A: "Executing Strengths: You are focused on making things happen, driving tasks to completion, and achieving goals.",
+                    B: "Influencing Strengths: You excel at influencing others, inspiring, and leading people to take action.",
+                    C: "Relationship Strengths: You value relationships, foster connections, and thrive in collaborative environments.",
+                    D: "Strategic Thinking Strengths: You enjoy analyzing information, thinking strategically, and planning for the future.",
+                    E: "Analytical Thinking Strengths: You focus on data, evidence, and understanding the details to solve problems effectively."
+                };
+
                 resultsContainer.innerHTML = `
                     <h2>Your Top Strengths</h2>
-                    <p>Your top two strengths are: <strong>${topTwoStrengths[0]}</strong> and <strong>${topTwoStrengths[1]}</strong>.</p>
+                    <p>Your top two strengths are:</p>
+                    <ul>
+                        <li><strong>${topTwoStrengths[0]}</strong>: ${strengthsDescriptions[topTwoStrengths[0]]}</li>
+                        <li><strong>${topTwoStrengths[1]}</strong>: ${strengthsDescriptions[topTwoStrengths[1]]}</li>
+                    </ul>
                     <div class="prompt-box">
                         <p>Based on the LeafSide Strengths Finder assessment, which is similar to the Clifton Strengths Finder, my top two strengths are ${topTwoStrengths[0]} and ${topTwoStrengths[1]}. Based on these results, please provide:</p>
                         <ul>
-                            <li>STRENGTHS ANALYSIS...</li>
-                            <li>PRACTICAL APPLICATIONS...</li>
-                            <li>CAREER DEVELOPMENT...</li>
-                            <li>COLLABORATION STRATEGIES...</li>
-                            <li>GROWTH OPPORTUNITIES...</li>
+                            <li>STRENGTHS ANALYSIS: What these strengths typically mean in a professional context and how they complement each other.</li>
+                            <li>PRACTICAL APPLICATIONS: Specific ways to leverage these strengths in daily work tasks and examples of projects where these strengths are valuable.</li>
+                            <li>CAREER DEVELOPMENT: Career paths and roles that particularly suit this strength combination, and skills to develop further.</li>
+                            <li>COLLABORATION STRATEGIES: How to effectively communicate and collaborate with others using these strengths.</li>
+                            <li>GROWTH OPPORTUNITIES: Potential challenges and blind spots associated with these strengths, and how to address them.</li>
                         </ul>
                     </div>
                 `;
