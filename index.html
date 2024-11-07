@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeafSide Strengths Finder Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --leafside-green: #5F9250;
+            --accent-green: #94B652;
+            --leafside-orange: #DF6333;
+            --leafside-grey: #666666;
+            --lightest-green: #EFF4ED;
+            --dark-green: #3D6432;
+            --pale-green: #DFE9DC;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--lightest-green);
+            color: var(--leafside-grey);
+            line-height: 1.6;
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--dark-green);
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .progress-container {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: var(--lightest-green);
+            border-radius: 4px;
+        }
+
+        .progress-bar {
+            background-color: var(--pale-green);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background-color: var(--leafside-green);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--leafside-grey);
+        }
+
+        .question {
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid var(--pale-green);
+            border-radius: 4px;
+        }
+
+        .question-text {
+            font-weight: bold;
+            color: var(--dark-green);
+            margin-bottom: 10px;
+        }
+
+        .options label {
+            display: block;
+            padding: 8px;
+            cursor: pointer;
+            margin: 8px 0;
+            border-radius: 4px;
+        }
+
+        .options label:hover {
+            background-color: var(--lightest-green);
+        }
+
+        input[type="radio"] {
+            margin-right: 8px;
+        }
+
+        button {
+            background-color: var(--leafside-green);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'Montserrat', sans-serif;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: var(--dark-green);
+        }
+
+        button:disabled {
+            background-color: var(--leafside-grey);
+            cursor: not-allowed;
+        }
+
+        #results {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: var(--pale-green);
+            border-radius: 4px;
+            display: none;
+        }
+
+        .prompt-box {
+            background-color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            border: 1px solid var(--pale-green);
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Welcome to the LeafSide Strengths Finder Quiz</h1>
+        <p>Answer the following 25 questions to discover your top strengths. Once completed, you'll receive an analysis of your top two strengths and a prompt to explore them further.</p>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="progress-text">0 of 25 questions answered</div>
+        </div>
+        
+        <form id="quiz-form">
+            <div id="questions"></div>
+            <button type="submit" id="submit-button" disabled>Calculate Results</button>
+        </form>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const quizForm = document.getElementById("quiz-form");
+            const questionsContainer = document.getElementById("questions");
+            const submitButton = document.getElementById("submit-button");
+            const resultsContainer = document.getElementById("results");
+            const progressFill = document.querySelector(".progress-fill");
+            const progressText = document.querySelector(".progress-text");
+
+            const questions = [
+                { text: "1. When faced with a task, I typically:", options: ["A) Dive right in and get it done.", "B) Plan and organize my approach.", "C) Focus on the details and accuracy.", "D) Consider the long-term implications of my actions.", "E) Seek feedback and input from others."] },
+                { text: "2. I am most motivated by:", options: ["A) Setting and achieving goals.", "B) Creating order and structure.", "C) Ensuring tasks are completed efficiently.", "D) Making a positive impact on the world.", "E) Learning new things and expanding my knowledge."] },
+                // Add more questions here (total 25)
+            ];
+
+            function loadQuestions() {
+                questionsContainer.innerHTML = "";
+                questions.forEach((question, index) => {
+                    const questionDiv = document.createElement("div");
+                    questionDiv.classList.add("question");
+
+                    const questionText = document.createElement("div");
+                    questionText.classList.add("question-text");
+                    questionText.textContent = question.text;
+                    questionDiv.appendChild(questionText);
+
+                    const optionsDiv = document.createElement("div");
+                    optionsDiv.classList.add("options");
+
+                    question.options.forEach(option => {
+                        const label = document.createElement("label");
+                        const input = document.createElement("input");
+                        input.type = "radio";
+                        input.name = `question-${index}`;
+                        input.value = option.charAt(0); // Store option letter (A, B, C, D, E)
+                        label.appendChild(input);
+                        label.appendChild(document.createTextNode(option));
+                        optionsDiv.appendChild(label);
+                    });
+
+                    questionDiv.appendChild(optionsDiv);
+                    questionsContainer.appendChild(questionDiv);
+                });
+
+                updateProgress();
+            }
+
+            function updateProgress() {
+                const answeredQuestions = document.querySelectorAll("input[type='radio']:checked").length;
+                const totalQuestions = questions.length;
+                const progressPercent = (answeredQuestions / totalQuestions) * 100;
+
+                progressFill.style.width = `${progressPercent}%`;
+                progressText.textContent = `${answeredQuestions} of ${totalQuestions} questions answered`;
+
+                submitButton.disabled = answeredQuestions < totalQuestions;
+            }
+
+            quizForm.addEventListener("change", updateProgress);
+
+            quizForm.addEventListener("submit", function(e) {
+                e.preventDefault();
+                calculateResults();
+            });
+
+            function calculateResults() {
+                const answerCounts = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+                const selectedAnswers = document.querySelectorAll("input[type='radio']:checked");
+
+                selectedAnswers.forEach(answer => {
+                    answerCounts[answer.value]++;
+                });
+
+                const strengths = Object.keys(answerCounts).sort((a, b) => answerCounts[b] - answerCounts[a]);
+                const topTwoStrengths = strengths.slice(0, 2);
+
+                resultsContainer.innerHTML = `
+                    <h2>Your Top Strengths</h2>
+                    <p>Your top two strengths are: <strong>${topTwoStrengths[0]}</strong> and <strong>${topTwoStrengths[1]}</strong>.</p>
+                    <div class="prompt-box">
+                        <p>Based on the LeafSide Strengths Finder assessment, which is similar to the Clifton Strengths Finder, my top two strengths are ${topTwoStrengths[0]} and ${topTwoStrengths[1]}. Based on these results, please provide:</p>
+                        <ul>
+                            <li>STRENGTHS ANALYSIS...</li>
+                            <li>PRACTICAL APPLICATIONS...</li>
+                            <li>CAREER DEVELOPMENT...</li>
+                            <li>COLLABORATION STRATEGIES...</li>
+                            <li>GROWTH OPPORTUNITIES...</li>
+                        </ul>
+                    </div>
+                `;
+                resultsContainer.style.display = "block";
+            }
+
+            loadQuestions();
+        });
+    </script>
+</body>
+</html>
